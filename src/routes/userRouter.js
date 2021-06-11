@@ -10,9 +10,9 @@ router.post("/", (req, res) => {
 	const newUser = new User(req.body);
 	newUser.save()
 		.then((response) => {
+			sendWelcomeEmail(response.email, response.name);
 			response.generateAuthToken().then((token) => {
 				res.send({ response, token });
-				sendWelcomeEmail(response.email, response.name);
 			});
 		})
 		.catch((e) => {
