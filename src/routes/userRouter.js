@@ -29,17 +29,13 @@ router.post("/login", async (req, res) => {
 		.then((response) => {
 			response.generateAuthToken()
 				.then((token) => {
-					res.status(
-						200
-					).send({
+					res.status(200).send({
 						response,
 						token,
 					});
 				})
 				.catch((e) => {
-					res.status(
-						400
-					).send(e);
+					res.status(400).send(e);
 				});
 		})
 		.catch((e) => {
@@ -96,11 +92,7 @@ router.patch("/update-me", auth, async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdates = ["name", "age", "email", "password"];
 	if (!updates.every((update) => allowedUpdates.includes(update))) {
-		return res
-			.status(400)
-			.send(
-				"You can only update name, age, email-id and password"
-			);
+		return res.status(400).send("You can only update name, age, email-id and password");
 	}
 	try {
 		updates.forEach((update) => {
@@ -151,10 +143,7 @@ router.post(
 	auth,
 	upload.single("avatar"),
 	async (req, res) => {
-		const buffer = await sharp(req.file.buffer)
-			.resize({ width: 250, height: 250 })
-			.png()
-			.toBuffer();
+		const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer();
 		req.user.avatar = buffer;
 		await req.user.save();
 		res.send();
