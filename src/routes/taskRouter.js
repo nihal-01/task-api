@@ -25,8 +25,16 @@ router.get("/", auth, async (req, res) => {
 				path: "tasks",
 				match,
 				options: {
-					limit: parseInt(req.query.limit),
-					skip: parseInt(req.query.skip),
+					limit: parseInt(
+						req
+							.query
+							.limit
+					),
+					skip: parseInt(
+						req
+							.query
+							.skip
+					),
 					sort,
 				},
 			})
@@ -69,6 +77,24 @@ router.patch("/:id", auth, async (req, res) => {
 		res.status(200).send(task);
 	} catch (e) {
 		res.send(500).send(e.message);
+	}
+});
+
+// Delete a Task
+router.delete("/:id", auth, async (req, res) => {
+	try {
+		const task = await Task.findOneAndRemove({
+			_id: req.params.id,
+			owner: req.user._id,
+		});
+
+		if (!task) {
+			return res.status(404).send();
+		}
+
+		res.status(200).send();
+	} catch (e) {
+		res.status(500).send(e.message);
 	}
 });
 

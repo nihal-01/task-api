@@ -6,14 +6,17 @@ const auth = require("../middleware/auth");
 const sendWelcomeEmail = require("../email/connection");
 
 // Signup new user
-router.post("/", (req, res) => {
+router.post("", (req, res) => {
 	const newUser = new User(req.body);
 	newUser.save()
 		.then((response) => {
-			sendWelcomeEmail(response.email, response.name);
 			response.generateAuthToken().then((token) => {
-				res.send({ response, token });
+				res.status(201).send({
+					response,
+					token,
+				});
 			});
+			// sendWelcomeEmail(response.email, response.name);
 		})
 		.catch((e) => {
 			res.send(e);
@@ -26,10 +29,17 @@ router.post("/login", async (req, res) => {
 		.then((response) => {
 			response.generateAuthToken()
 				.then((token) => {
-					res.status(200).send({ response, token });
+					res.status(
+						200
+					).send({
+						response,
+						token,
+					});
 				})
 				.catch((e) => {
-					res.status(400).send(e);
+					res.status(
+						400
+					).send(e);
 				});
 		})
 		.catch((e) => {
@@ -86,7 +96,11 @@ router.patch("/update-me", auth, async (req, res) => {
 	const updates = Object.keys(req.body);
 	const allowedUpdates = ["name", "age", "email", "password"];
 	if (!updates.every((update) => allowedUpdates.includes(update))) {
-		return res.status(400).send("You can only update name, age, email-id and password");
+		return res
+			.status(400)
+			.send(
+				"You can only update name, age, email-id and password"
+			);
 	}
 	try {
 		updates.forEach((update) => {
@@ -137,7 +151,10 @@ router.post(
 	auth,
 	upload.single("avatar"),
 	async (req, res) => {
-		const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer();
+		const buffer = await sharp(req.file.buffer)
+			.resize({ width: 250, height: 250 })
+			.png()
+			.toBuffer();
 		req.user.avatar = buffer;
 		await req.user.save();
 		res.send();
@@ -151,7 +168,9 @@ router.post(
 router.delete("/me/avatar", auth, async (req, res) => {
 	try {
 		if (!req.user.avatar) {
-			return res.status(400).send({ error: "You have no avatar" });
+			return res.status(400).send({
+				error: "You have no avatar",
+			});
 		}
 		req.user.avatar = undefined;
 		await req.user.save();
